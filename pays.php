@@ -1,26 +1,27 @@
 <?php
 
 /**
- * Plugin Name: Pays
- * Description: Filter posts by country.
+ * Nom du Plugin: Pays
+ * Description: Filtrer articles par pays.
  * Version: 1.0
- * Author: Your Name
+ * Auteur: Mathieu Croteau-Dufour
  */
 
 function pays_enqueue_scripts()
 {
-  wp_enqueue_script('pays-script', plugin_dir_url(__FILE__) . 'pays.js', array('jquery'), null, true);
+  wp_enqueue_script('pays-script', plugin_dir_url(__FILE__) . 'js/pays.js', array('jquery'), null, true);
   wp_localize_script('pays-script', 'pays_ajax', array('ajax_url' => admin_url('admin-ajax.php')));
 }
 add_action('wp_enqueue_scripts', 'pays_enqueue_scripts');
 
-function pays_filter_posts()
+// Filtrer les articles
+function filtre_pays()
 {
-  $country = sanitize_text_field($_POST['country']);
+  $pays = sanitize_text_field($_POST['pays']);
 
   $args = array(
     'post_type' => 'post',
-    's' => $country,
+    's' => $pays,
   );
 
   $query = new WP_Query($args);
@@ -33,15 +34,33 @@ function pays_filter_posts()
         <h2><?php the_title(); ?></h2>
         <div><?php the_excerpt(); ?></div>
       </article>
-<?php
+  <?php
     }
   } else {
-    echo 'No posts found.';
+    echo 'Aucun article trouvé.';
   }
 
   wp_reset_postdata();
   wp_die();
 }
-add_action('wp_ajax_nopriv_pays_filter_posts', 'pays_filter_posts');
-add_action('wp_ajax_pays_filter_posts', 'pays_filter_posts');
+add_action('wp_ajax_nopriv_filtre_pays', 'filtre_pays');
+add_action('wp_ajax_filtre_pays', 'filtre_pays');
+
+// Fonction pour Shortcode
+function afficher_pays_bouttons()
+{
+  ob_start(); ?>
+  <div id="pays_bouttons">
+    <?php
+    $pays = ["France", "États-Unis", "Canada", "Argentine", "Chili", "Belgique", "Maroc", "Mexique", "Japon", "Italie", "Islande", "Chine", "Grèce", "Suisse"];
+    foreach ($pays as $pays) {
+      echo '<button class="pays_bouton" data-pays="' . $pays . '">' . $pays . '</button>';
+    }
+    ?>
+  </div>
+  <div id="posts-container"></div>
+<?php
+  return ob_get_clean();
+}
+add_shortcode('pays_button', 'afficher_pays_bouttons');
 ?>

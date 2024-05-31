@@ -1,13 +1,13 @@
 jQuery(document).ready(function ($) {
-  $('.country-button').on('click', function () {
-    var country = $(this).data('country');
+  $('.pays_bouton').on('click', function () {
+    var pays = $(this).data('pays');
 
     $.ajax({
       url: pays_ajax.ajax_url,
       type: 'post',
       data: {
-        action: 'pays_filter_posts',
-        country: country
+        action: 'filtre_pays',
+        pays: pays
       },
       success: function (response) {
         $('#posts-container').html(response);
@@ -15,6 +15,5 @@ jQuery(document).ready(function ($) {
     });
   });
 
-  // Trigger the AJAX call for France when the page loads
-  $('.country-button[data-country="France"]').click();
+  $('.pays_bouton[data-pays="France"]').click();
 });
